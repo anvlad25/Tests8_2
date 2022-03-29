@@ -8,6 +8,7 @@ import com.geekbrains.tests.model.SearchResponse
 import com.geekbrains.tests.repository.FakeGitHubRepository
 import com.geekbrains.tests.view.search.ScreenState
 import com.geekbrains.tests.view.search.SearchViewModel
+import com.nhaarman.mockito_kotlin.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Assert
 import org.junit.Before
@@ -15,7 +16,9 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
+import org.mockito.Mockito
 import org.mockito.Mockito.`when`
+import org.mockito.Mockito.times
 import org.mockito.MockitoAnnotations
 import org.robolectric.annotation.Config
 
@@ -98,6 +101,19 @@ class SearchViewModelTest {
             } finally {
                 liveData.removeObserver(observer)
             }
+        }
+    }
+
+    @Test
+    fun coroutines_TestCallSearchGithubAsync() {
+        testCoroutineRule.runBlockingTest {
+            `when`(repository.searchGithubAsync(SEARCH_QUERY)).thenReturn(
+                SearchResponse(1, listOf())
+            )
+
+            searchViewModel.searchGitHub(SEARCH_QUERY)
+            verify(repository, times(1)).searchGithubAsync(SEARCH_QUERY)
+
         }
     }
 
